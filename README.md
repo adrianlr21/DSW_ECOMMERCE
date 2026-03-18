@@ -1,7 +1,7 @@
 # 🛒 DSW_ECOMMERCE
 
 ## 📌 Descripción
-Proyecto sobre un sistema de ecommerce desarrollado en equipo, orientado a la gestión de productos, categorías, usuarios y ventas.
+Proyecto grupal sobre un Sistema de Ecommerce desarrollado en equipo, orientado a la gestión de productos, categorías, usuarios y ventas.
 
 ---
 
