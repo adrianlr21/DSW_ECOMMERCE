@@ -1,0 +1,114 @@
+﻿@inject ICarritoService carritoService
+@implements IDisposable
+
+@inject SweetAlertService SWAService;
+@inject NavigationManager navManager;
+@using WEB.Extensiones;
+@using Microsoft.AspNetCore.Components.Authorization;
+@using System.Security.Claims;
+@inject AuthenticationStateProvider autProvider;
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<nav class="navbar navbar-expand-sm navbar-toggleable-sm" style="background: #1b1e22;">
+    <div class="container">
+        <a class="navbar-brand" runat="server" href="#" style="font-weight:700; text-transform:uppercase; color:#fffefe;">Ecommerce Demo</a>
+        <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Alternar navegación" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="@NavMenuCssClass navbar-collapse d-sm-inline-flex justify-content-between">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+
+
+                <AuthorizeView Roles="Administrador">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: #fffefe;">
+                            Mantenimientos
+                        </a>
+                        <ul class="dropdown-menu" style="background:#1b1e22; color:#fffefe">
+                            <li class="nav-item" b-test><NavLink class="nav-link" href="dashboard"> Dashboard</NavLink></li>
+                            <li class="nav-item"><NavLink class="nav-link" href="usuarios"> Usuarios</NavLink></li>
+                            <li class="nav-item"><NavLink class="nav-link" href="categorias"> Categorias</NavLink></li>
+                            <li class="nav-item"><NavLink class="nav-link" href="productos"> Productos</NavLink></li>
+                        </ul>
+                    </li>  
+                </AuthorizeView>
+
+                <li class="nav-item"><NavLink class="nav-link" href="catalogo" style="color: #fffefe;"> Tienda</NavLink></li>
+            </ul>
+
+            <AuthorizeView>
+                <Authorized>
+                    <span class="navbar-text me-3" style="font-weight:900; text-transform:uppercase; color: #fffefe">
+                        @context.User.Claims.Where(c => c.Type == ClaimTypes.Name).Select(c => c.Value).SingleOrDefault()
+                    </span>
+                </Authorized>
+            </AuthorizeView>
+
+            <a class="btn btn-close-white ms-md-0 me-3" href="/cart" >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16">
+                    <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l1.313 7h8.17l1.313-7zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2" />
+                </svg>
+                Carrito
+                <span class="badge bg-dark text-white ms-1 rounded-pill">@mostrarCantidadCarrito()</span>
+            </a>
+
+            <AuthorizeView>
+                <Authorized>
+                    <button class="btn btn-danger ms-auto ms-md-0 me-3" type="button" @onclick="CerrarSesion">Salir</button>
+                </Authorized>
+
+                <NotAuthorized>
+                    <a class="btn btn-light ms-auto ms-md-0 me-3" href="/login">Iniciar sesión</a>
+                </NotAuthorized>
+            </AuthorizeView>
+
+        </div>
+    </div>
+</nav>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    protected override void OnInitialized()
+    {
+        carritoService.MostrarItems += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        carritoService.MostrarItems -= StateHasChanged;
+    }
+
+    private int mostrarCantidadCarrito()
+    {
+        return carritoService.CantidadProductos();
+    }
+
+    private async Task CerrarSesion()
+    {
+        SweetAlertResult result = await SWAService.FireAsync(new SweetAlertOptions
+            {
+                Title = "¿Cerrar Sesión?",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "SALIR",
+                CancelButtonText = "NO"
+            });
+
+        if (result.IsConfirmed)
+        {
+            var autenticacion = (AutenticacionExtension)autProvider;
+
+            await autenticacion.ActualizarEstadoAutenticacion(null);
+            navManager.NavigateTo("/", true);
+        }
+    }
+}

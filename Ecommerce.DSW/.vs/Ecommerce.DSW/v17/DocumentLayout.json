@@ -1,0 +1,37 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\User\\Downloads\\Proyecto-DSW-ECommerce\\Ecommerce.DSW\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{E605A0E6-880F-4403-83E5-7392C52FC64C}|WEB\\WEB.csproj|c:\\users\\user\\downloads\\proyecto-dsw-ecommerce\\ecommerce.dsw\\web\\pages\\auth\\registro.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E605A0E6-880F-4403-83E5-7392C52FC64C}|WEB\\WEB.csproj|solutionrelative:web\\pages\\auth\\registro.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Registro.razor",
+              "DocumentMoniker": "C:\\Users\\User\\Downloads\\Proyecto-DSW-ECommerce\\Ecommerce.DSW\\WEB\\Pages\\AUTH\\Registro.razor",
+              "RelativeDocumentMoniker": "WEB\\Pages\\AUTH\\Registro.razor",
+              "ToolTip": "C:\\Users\\User\\Downloads\\Proyecto-DSW-ECommerce\\Ecommerce.DSW\\WEB\\Pages\\AUTH\\Registro.razor",
+              "RelativeToolTip": "WEB\\Pages\\AUTH\\Registro.razor",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAkAAAAIAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-05-10T23:29:45.44Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

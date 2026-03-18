@@ -1,0 +1,84 @@
+﻿@page "/registrarse"
+@layout LoginLayout
+
+@inject IUsuarioService IUsuarioService
+@inject NavigationManager navManager
+@inject SweetAlertService SWAService
+
+
+<style>
+    body{
+        background: #262a2d;
+    }
+</style>
+<div class="container" style="margin-top: 10rem">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow-lg p-4" style="background: #383b3d">
+                <h2 class="text-center mb-4" style=" background:#383b3d; color:#fff; font-weight:900; text-transform:uppercase">Crear Cuenta</h2>
+                <hr>
+
+                <EditForm Model="modelo" OnValidSubmit="GuardarCambios" style="background: #383b3d">
+                    <DataAnnotationsValidator />
+
+                    <div class="mb-3">
+                        <input class="form-control" type="text" placeholder="Nombre Completo" @bind-value="modelo.NombreCompleto" autocomplete="off" />
+                        <ValidationMessage For="@(()=>modelo.NombreCompleto)" />
+                    </div>
+
+                    <div class="mb-3">
+                        <input class="form-control" type="email" placeholder="Correo Electrónico" @bind-value="modelo.Correo" autocomplete="off" />
+                        <ValidationMessage For="@(()=>modelo.Correo)" />
+                    </div>
+
+                    <div class="row mb-3" style="background: #383b3d">
+                        <div class="col-md-6" style="background: #383b3d">
+                            <input class="form-control" type="password" placeholder="Contraseña" @bind-value="modelo.Clave" autocomplete="off" />
+                            <ValidationMessage For="@(()=>modelo.Clave)" />
+                        </div>
+                        <div class="col-md-6" style="background: #383b3d">
+                            <input class="form-control" type="password" placeholder="Confirmar Contraseña" @bind-value="modelo.ConfirmarClave" autocomplete="off" />
+                            <ValidationMessage For="@(()=>modelo.ConfirmarClave)" />
+                        </div>
+                    </div>
+
+                    <div class="text-center" style="background: #383b3d">
+                        <button class="btn btn-primary btn-lg w-50" style="font-size:20px; font-weight:800" type="submit">Registrarse</button>
+                    </div>
+                </EditForm>
+
+                <hr>
+
+                <div class="text-center mt-4" style="background: #383b3d">
+                    <p style="background: #383b3d; color: #fff">¿Ya tienes una cuenta? <a style="background: #383b3d; text-decoration:none; text-transform:uppercase; font-weight:900" href="/login">Inicia sesión aquí</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private UsuarioDTO modelo = new UsuarioDTO();
+
+    private async Task GuardarCambios()
+    {
+        if (modelo.Clave != modelo.ConfirmarClave)
+        {
+            await SWAService.FireAsync("Las contraseñas no coinciden");
+            return;
+        }
+
+        modelo.Rol = "Cliente";
+        var response = await IUsuarioService.Crear(modelo);
+
+        if (response.Correcto)
+        {
+            await SWAService.FireAsync("Se ha registrado correctamente");
+            navManager.NavigateTo("/login");
+        }
+        else
+        {
+            await SWAService.FireAsync("No se pudo completar el registro");
+        }
+    }
+}

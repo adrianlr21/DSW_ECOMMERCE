@@ -1,0 +1,106 @@
+﻿@page "/categoria"
+@page "/categoria/{id:int}"
+
+@inject ICategoriaService iCategoriaService;
+@inject SweetAlertService SWAService;
+@inject NavigationManager navService;
+
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize(Roles = "Administrador")];
+
+<style>
+    body {
+        background-color: #262a2d;
+    }
+</style>
+
+<h1 style="color:#FFF; text-align:center; margin-top: 10px; font-weight: 900">@Titulo</h1>
+<div class="row justify-content-center mt-3">
+    <div class="col-sm-12 col-md-8 col-xl-10" style="width:500px">
+
+        <EditForm Model="modelo" OnValidSubmit="GuardarCambios">
+            <DataAnnotationsValidator></DataAnnotationsValidator>
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Nombre Categoria" @bind-value="modelo.Nombre">
+            </div>
+            <ValidationMessage For="@(()=>modelo.Nombre)" />
+
+            <div class="mt-3" style="margin-left:6rem">
+                <button type="submit" class="btn btn-primary" style="font-weight:600; font-size:20px;width:150px">@boton</button>
+                <a href="/categorias" class="btn btn-secondary" style="font-weight:600; font-size:20px;width:150px">Volver</a>
+            </div>
+        </EditForm>
+
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+    private string Titulo = "Nueva Categoria";
+    private string boton = "Crear";
+    private CategoriaDTO modelo = new CategoriaDTO();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (id != 0)
+        {
+            Titulo = "Editar Categoria";
+            boton = "Actualizar";
+
+            var response = await iCategoriaService.Obtener(id);
+            if (response.Correcto!)
+            {
+                modelo = (CategoriaDTO)response.Resultado!;
+            }
+            else
+                await SWAService.FireAsync(response.Mensaje);
+        }
+    }
+
+    private async Task GuardarCambios()
+    {
+        bool respuesta = true;
+        string mensaje = string.Empty;
+
+        if (id != 0)
+        {
+            var response = await iCategoriaService.Editar(modelo);
+            if (response.Correcto)
+            {
+                mensaje = "No se logró modificar";
+            }
+            else
+            {
+                respuesta = false;
+                mensaje = "Modificado";
+            }
+        }
+        else
+        {
+            var response = await iCategoriaService.Crear(modelo);
+
+            if (response.Correcto)
+            {
+                mensaje = "Categoria creada";
+            }
+            else
+            {
+                respuesta = false;
+                mensaje = "No se logró crear";
+            }
+        }
+
+        if (respuesta)
+        {
+            await SWAService.FireAsync(mensaje);
+            navService.NavigateTo("/categorias");
+        }
+        else
+        {
+            await SWAService.FireAsync(mensaje);
+            navService.NavigateTo("/categorias");
+        }
+    }
+}

@@ -1,0 +1,270 @@
+﻿ @page "/cart"
+
+
+@inject ICarritoService iCarritoService
+@inject IVentaService iVentaService
+@inject SweetAlertService SWAService;
+@inject NavigationManager navService
+
+@using Microsoft.AspNetCore.Components.Authorization;
+@using System.Security.Claims;
+
+
+
+<style>
+    body {
+        background-color: #262a2d;
+    }
+</style>
+<div class="row mt-4">
+    <div class="col-sm-8">
+        <div class="card mb-3" style="background: #383b3d">
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm" style="background: #383b3d">
+                        <thead style="background: #383b3d">
+                            <tr>
+                                <th style="width:102px; color:#fff"></th>
+                                <th style="color:#fff">Producto</th>
+                                <th style="color:#fff">Precio</th>
+                                <th style="color:#fff">Cantidad</th>
+                                <th style="color:#fff">Total</th>
+                                <th style="color:#fff"></th>
+                            </tr>
+                        </thead>
+                        <tbody style="background: #383b3d">
+
+                            @if (list.Any())
+                            {
+                                foreach (var item in list)
+                                {
+                                    <tr style="background: #383b3d">
+                                        <td valign="middle" style="color:#fff">
+                                            <img class="card-img-top" src="@item.Producto.Imagen" style="width:100px">
+                                        </td>
+                                        <td valign="middle" style="color:#fff">@item.Producto.Nombre</td>
+                                        <td valign="middle" style="color:#fff">@item.Precio</td>
+                                        <td valign="middle" align="center" style="color:#fff">
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="btn btn-outline-light" @onclick="(() =>DisminuirCarrito(item.Producto.IdProducto))">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash-lg" viewBox="0 0 16 16">
+                                                        <path fill-rule="evenodd" d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8" />
+                                                    </svg>
+                                                </button>
+                                                <input class="form-control" readonly="readonly" style="width:50px" @bind-value="item.Cantidad" />
+                                                <button type="button" class="btn btn-outline-light" @onclick="(() =>AumentarCarrito(item.Producto.IdProducto))">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" color="#fff" fill="currentColor" class="bi bi-cart-plus" viewBox="0 0 16 16">
+                                                        <path d="M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9z" />
+                                                        <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1zm3.915 10L3.102 4h10.796l-1.313 7zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0m7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </td>
+                                        <td valign="middle" style="color:#fff">@item.Total</td>
+                                        <td valign="middle" style="color:#fff">
+                                            <button type="button" class="btn btn-outline-light" @onclick="(async () => await EliminarCarrito(item.Producto.IdProducto))">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
+                                                    <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
+                                                </svg>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+
+
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="6">
+                                        <div style="text-align:center; font-size:20px; text-transform:uppercase;background:#383b3d; color:#fff; height:100px; font-weight:800; margin-top:50px">
+                                            No hay productos seleccionados
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+
+
+                        </tbody>
+                    </table>
+                </div>
+
+
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="col-sm-4">
+        <div class="card mb-3" style="background: #383b3d">
+            <div class="card-body" style="background: #383b3d">
+                <EditForm Model="tarjeta" OnValidSubmit="ProcesarPago" style="background: #383b3d">
+                    <DataAnnotationsValidator></DataAnnotationsValidator>
+
+                    <div class="mb-2">
+                        <label class="form-label" style="color:#fff">Nombre Titular</label>
+                        <input type="text" class="form-control form-control-sm" placeholder="" @bind-value="tarjeta.Titular" disabled="@disabled">
+                        <ValidationMessage For="@(()=>tarjeta.Titular)" />
+
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label" style="color:#fff">Numero Tarjeta</label>
+                        <input type="text" class="form-control form-control-sm" placeholder="##############" autocomplete="off" @bind-value="tarjeta.NumeroT" disabled="@disabled">
+                        <ValidationMessage For="@(()=>tarjeta.NumeroT)" />
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="mb-2">
+                                <label class="form-label" style="color:#fff">Vigencia</label>
+                                <input type="text" class="form-control form-control-sm" placeholder="MM/YY" autocomplete="off" @bind-value="tarjeta.VigenciaT" disabled="@disabled">
+                                <ValidationMessage For="@(()=>tarjeta.VigenciaT)" />
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="mb-2">
+                                <label class="form-label" style="color:#fff">CVV</label>
+                                <input type="text" class="form-control form-control-sm" placeholder="###" autocomplete="off" @bind-value="tarjeta.CVV" disabled="@disabled">
+                                <ValidationMessage For="@(()=>tarjeta.CVV)" />
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="d-flex justify-content-between">
+                        <div style="color:#fff; font-weight:700">Total a pagar:</div>
+                        <div style="color:#fff">S/. @(list.Sum(i => i.Total))</div>
+                    </div>
+                    <div class="mt-2">
+                        <div class="d-grid gap-1">
+                            <button class="btn btn-outline-light float-end" style="color:#fff" type="submit" disabled="@disabled">Procesar pago</button>
+                        </div>
+                    </div>
+                </EditForm>
+                <AuthorizeView>
+                    <NotAuthorized>
+                        <div class="alert alert-light mt-2" role="alert">
+                            Inicia Sesion para realizar la compra!!
+                        </div>
+                    </NotAuthorized>
+                </AuthorizeView>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private bool disabled = true;
+    private List<CarritoDTO> list = new List<CarritoDTO>();
+    private decimal? TotalPagar = 0;
+    private TarjetaDTO tarjeta = new TarjetaDTO();
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        list = await iCarritoService.DevolverCarrito();
+
+        var autState = await authenticationState;
+        if (autState.User.Identity.IsAuthenticated)
+        {
+            disabled = false;
+        }
+    }
+
+
+
+    private void DisminuirCarrito(int id)
+    {
+        CarritoDTO item = list.First(p => p.Producto.IdProducto == id);
+
+        if (item.Cantidad - 1 > 0)
+        {
+            decimal? precioFinal = (item.Producto.PrecioOferta != 0 && item.Producto.PrecioOferta < item.Producto.Precio) ? item.Producto.PrecioOferta : item.Producto.Precio;
+
+            item.Cantidad--;
+            item.Total = item.Cantidad * precioFinal;
+        }
+    }
+
+
+
+    private void AumentarCarrito(int id)
+    {
+        CarritoDTO item = list.First(p => p.Producto.IdProducto == id);
+
+        decimal? precioFinal = (item.Producto.PrecioOferta != 0 && item.Producto.PrecioOferta < item.Producto.Precio) ? item.Producto.PrecioOferta : item.Producto.Precio;
+
+
+        item.Cantidad++;
+        item.Total = item.Cantidad * precioFinal;
+    }
+
+
+
+    private async Task EliminarCarrito(int idProducto)
+    {
+        CarritoDTO producto = list.First(p => p.Producto.IdProducto == idProducto);
+
+        if (producto != null)
+        {
+            list.Remove(producto);
+            await iCarritoService.EliminarCarrito(idProducto);
+        }
+    }
+
+
+
+    private async Task ProcesarPago()
+    {
+        if (list.Count == 0)
+        {
+            await SWAService.FireAsync("No se encontraron productos");
+            return;
+        }
+
+        List<DetalleVentaDTO> detalle = new List<DetalleVentaDTO>();
+
+        foreach (var item in list)
+        {
+            detalle.Add(new DetalleVentaDTO()
+                {
+                    IdProducto = item.Producto.IdProducto,
+                    Cantidad = item.Cantidad,
+                    Total = item.Total
+                });
+        }
+
+        var autState = await authenticationState;
+        string idUsuario = autState.User.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).Single();
+
+
+        VentaDTO modelo = new VentaDTO()
+            {
+                IdUsuario = Convert.ToInt32(idUsuario),
+                Total = list.Sum(i => i.Total),
+                DetalleVenta = detalle
+            };
+
+
+        var response = await iVentaService.Registrar(modelo);
+
+        if (response.Correcto)
+        {
+            await iCarritoService.LimpiarCarrito();
+            await SWAService.FireAsync("Venta registrada");
+            navService.NavigateTo("/catalogo");
+        }
+        else
+        {
+            await SWAService.FireAsync(response.Mensaje);
+        }
+    }
+
+
+}

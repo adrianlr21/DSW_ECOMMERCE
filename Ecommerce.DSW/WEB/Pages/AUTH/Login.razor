@@ -1,0 +1,78 @@
+﻿@page "/login"
+@layout LoginLayout
+
+@using WEB.Extensiones
+@using Microsoft.AspNetCore.Components.Authorization
+@inject IUsuarioService IUsuarioService
+@inject NavigationManager navManager
+@inject SweetAlertService SWAService
+@inject AuthenticationStateProvider autProvider
+
+<style>
+    *{
+        background: #262a2d;
+    }
+</style>
+<div class="container" style="margin-top: 10rem;">
+    <div class="row justify-content-center" >
+        <div class="col-lg-6">
+            <div class="card shadow-lg p-4" style="background: #383b3d">
+                <h2 class="text-center mb-4" style="background:#383b3d; color:#fff; font-weight:900; text-transform:uppercase">Iniciar Sesión</h2>
+                <hr>
+
+                <EditForm Model="modelo" OnValidSubmit="Iniciar" style="background: #383b3d">
+                    <DataAnnotationsValidator />
+
+                    <div class="mb-3">
+                        <input class="form-control" id="inputEmail" type="email" placeholder="Correo Electrónico" @bind="@modelo.Correo" autocomplete="off" />
+                        <ValidationMessage For="@(()=>modelo.Correo)" />
+                    </div>
+
+                    <div class="mb-3">
+                        <input class="form-control" id="inputPassword" type="password" placeholder="Contraseña" @bind="@modelo.Clave" autocomplete="off" />
+                        <ValidationMessage For="@(()=>modelo.Clave)" />
+                    </div>
+
+                    <div class="text-center" style="background: #383b3d">
+                        <button class="btn btn-primary btn-lg w-50"  style="font-size:20px; font-weight:800" type="submit">Ingresar</button>
+                    </div>
+                </EditForm>
+
+                <hr>
+
+                <div class="text-center mt-4" style="background: #383b3d">
+                    <p style="background: #383b3d; color: #fff">¿No tienes una cuenta? <a style="background: #383b3d; text-decoration:none; text-transform:uppercase; font-weight:900" href="/registrarse">Regístrate aquí</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private LoginDTO modelo = new LoginDTO();
+
+    private async Task Iniciar()
+    {
+        var response = await IUsuarioService.Autorizacion(modelo);
+        if (response.Correcto)
+        {
+            SesionDTO sesion = (SesionDTO)response.Resultado;
+
+            var autenticacion = (AutenticacionExtension)autProvider;
+            await autenticacion.ActualizarEstadoAutenticacion(sesion);
+
+            if (sesion.Rol.ToLower() == "cliente")
+            {
+                navManager.NavigateTo("/catalogo");
+            }
+            else
+            {
+                navManager.NavigateTo("/dashboard");
+            }
+        }
+        else
+        {
+            await SWAService.FireAsync(response.Mensaje);
+        }
+    }
+}
