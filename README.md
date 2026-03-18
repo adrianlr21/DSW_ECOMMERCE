@@ -6,7 +6,7 @@ Proyecto grupal sobre un Sistema de Ecommerce desarrollado en equipo, orientado 
 ---
 
 ## 🛠 Tecnologías utilizadas
-- Backend: C#
+- Backend: C#, HTML y CSS
 - Base de datos: SQL Server
 - Control de versiones: Git
 
